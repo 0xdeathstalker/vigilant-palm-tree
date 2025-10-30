@@ -11,8 +11,9 @@ import { menuData, type MenuItem } from "@/lib/data";
 import { useDrawerStore } from "@/store/drawer";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
-import useMeasure from "react-use-measure";
 import * as React from "react";
+import useMeasure from "react-use-measure";
+import { variants } from "./motion";
 
 type DirectionState = -1 | 1;
 
@@ -49,7 +50,7 @@ function MenuDrawer() {
 
         <DrawerContent
           showHandle={false}
-          className="max-w-[500px] mx-4 sm:mx-auto p-3 data-[vaul-drawer-direction=bottom]:bottom-4 data-[vaul-drawer-direction=bottom]:rounded-b-2xl data-[vaul-drawer-direction=bottom]:rounded-t-2xl overflow-hidden"
+          className="max-w-[500px] mx-4 sm:mx-auto p-3 data-[vaul-drawer-direction=bottom]:bottom-4 data-[vaul-drawer-direction=bottom]:rounded-b-2xl data-[vaul-drawer-direction=bottom]:rounded-t-2xl data-[vaul-drawer-direction=bottom]:max-h-[90vh] overflow-hidden"
         >
           <DrawerHeader className="sr-only">
             <DrawerTitle>Nested menu drawer component</DrawerTitle>
@@ -58,25 +59,13 @@ function MenuDrawer() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <motion.div animate={{ height: bounds.height }}>
+          <motion.div
+            animate={{ height: bounds.height }}
+            className="overflow-y-auto overflow-x-hidden"
+          >
             <div ref={ref}>
               {history.length > 0 ? (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGoBack}
-                    className="mb-3 shadow active:scale-[0.95]"
-                  >
-                    <ChevronLeft className="size-4" />
-                    Back
-                  </Button>
-                </motion.div>
+                <BackButton handleGoBack={handleGoBack} />
               ) : null}
 
               <AnimatePresence
@@ -128,10 +117,25 @@ function MenuDrawer() {
   );
 }
 
-const variants = {
-  initial: (direction: number) => ({ x: `${110 * direction}%`, opacity: 0 }),
-  animate: { x: "0%", opacity: 1 },
-  exit: (direction: number) => ({ x: `${-110 * direction}%`, opacity: 0 }),
-};
+function BackButton({ handleGoBack }: { handleGoBack: () => void }) {
+  return (
+    <motion.div
+      variants={variants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleGoBack}
+        className="mb-3 active:scale-[0.95]"
+      >
+        <ChevronLeft className="size-4" />
+        Back
+      </Button>
+    </motion.div>
+  );
+}
 
 export { MenuDrawer };
