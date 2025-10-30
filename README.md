@@ -31,4 +31,4 @@ npm run build
 
 ## Demo
 
-[View Live Demo](https://deng-iota.vercel.app/)
+[View Live Demo](https://vigilant-palm-tree-murex.vercel.app)
