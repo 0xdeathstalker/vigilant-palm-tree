@@ -12,38 +12,38 @@ import { useDrawerStore } from "@/store/drawer";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import useMeasure from "react-use-measure";
+import * as React from "react";
+
+type DirectionState = -1 | 1;
 
 function MenuDrawer() {
-  const { activeMenu, history, openDrawer, goToMenu, goBack } =
-    useDrawerStore();
+  const { activeMenu, history, goToMenu, goBack } = useDrawerStore();
   const [ref, bounds] = useMeasure();
+  const [direction, setDirection] = React.useState<DirectionState>(1);
 
   const currentMenu = activeMenu.length ? activeMenu : menuData;
 
-  function handleOpenDrawer() {
-    openDrawer(menuData);
-  }
-
   function handleGoToMenu(items: MenuItem[] | undefined) {
     if (items) {
+      setDirection(1);
       goToMenu(items);
     }
   }
 
   function handleGoBack() {
+    setDirection(-1);
     goBack();
   }
 
   return (
-    <MotionConfig transition={{ type: "spring", bounce: 0, duration: 0.4 }}>
+    <MotionConfig transition={{ type: "spring", bounce: 0, duration: 0.25 }}>
       <Drawer>
         <DrawerTrigger asChild>
           <Button
             variant="outline"
-            className="rounded-full"
-            onClick={handleOpenDrawer}
+            className="rounded-full bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
           >
-            open drawer
+            Open Menu
           </Button>
         </DrawerTrigger>
 
@@ -79,12 +79,18 @@ function MenuDrawer() {
                 </motion.div>
               ) : null}
 
-              <AnimatePresence mode="popLayout" initial={false}>
+              <AnimatePresence
+                mode="popLayout"
+                initial={false}
+                custom={direction}
+              >
                 <motion.ul
                   key={history.length}
-                  initial={{ x: "110%", opacity: 0 }}
-                  animate={{ x: 1, opacity: 1 }}
-                  exit={{ x: "-110%", opacity: 0 }}
+                  variants={variants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  custom={direction}
                   className="space-y-2"
                 >
                   {currentMenu.map((menu) => (
@@ -121,5 +127,11 @@ function MenuDrawer() {
     </MotionConfig>
   );
 }
+
+const variants = {
+  initial: (direction: number) => ({ x: `${110 * direction}%`, opacity: 0 }),
+  animate: { x: "0%", opacity: 1 },
+  exit: (direction: number) => ({ x: `${-110 * direction}%`, opacity: 0 }),
+};
 
 export { MenuDrawer };
